@@ -1,0 +1,13 @@
+Algorithm Split_search(array, start, end, key)
+{
+If(start > end) then return –1;
+Mid := start+end//2;
+If(array[start] == key) then return start;
+If(array[end] == key) then return end;
+If(array[mid] == key) then return mid;
+Left_result := Split_search(array, start+1, mid-1, key)
+If(Left_result != -1) then return Left_result;
+Right_result := Split_search(array, mid+1, end-1, key)
+If(Right_result != -1) then return Right_result;
+Return –1; #Key not found!
+}
