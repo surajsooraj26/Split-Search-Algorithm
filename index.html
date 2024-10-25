@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Split Search</title>
+    <style>
+        .nav {
+            padding: 1%;
+            background-color: green;
+            color: white;
+            width: 100%;
+            box-sizing: border-box; /* Ensure padding is included in the width */
+        }
+
+        .input {
+            padding: 1%;
+            background-color: rgb(79, 148, 79);
+            width: 100%;
+            box-sizing: border-box; 
+        }
+
+        .main {
+            padding: 1%;
+            background-color: lightgray;
+            display: inline-block;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .main p {
+            display: inline; 
+            margin: 0;
+        }
+
+        .each_box {
+            display: inline-block;
+            padding: 30px;
+            vertical-align: top; /* Align to the top of the line */
+            position: relative; /* Add relative positioning to .each_box */
+        }
+
+        .box {
+            border: 1px solid black;
+            padding: 10px;
+            display: inline-block;
+            margin-right: 10px; /* Add standard padding between boxes */
+            position: relative; /* Add relative positioning to .box */
+        }
+        #start_box{
+            border:3px solid red;
+        }
+        #mid_box{
+            border:3px solid yellow;
+        }
+        #end_box{
+            border:3px solid blueviolet;
+        }
+
+        /* Position labels at the bottom of each box */
+        .box-label {
+            position: absolute;
+            bottom: 0;
+            left: 50%; /* Center the label horizontally */
+            transform: translateX(-50%);
+            margin-bottom: 5px;
+        }
+        .array-box {
+            background-color: #fcfcfc; /* Yellow color for array boxes */
+            margin-right: 0;
+            padding: 10px; /* No margin between array boxes */
+            padding-top: 20px; /* Add space at the top */
+            text-align: center; /* Center text within the box */
+        }
+
+        .array-box-label {
+            position: absolute;
+            bottom: -43px; /* Adjust as needed */
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+
+        /* Additional style for start, mid, end boxes */
+        .start-mid-end-box {
+            margin-right: 10px; /* Add margin between start, mid, end boxes */
+        }
+
+        .found-box {
+            border: 3px solid green;
+            padding: 10px;
+            margin-right: 10px;
+        }
+        .not-found-box {
+            border: 3px solid red;
+            padding: 10px;
+            margin-right: 10px;
+            margin-top: 22px;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="nav">
+        <h1> Split Search Algorithm </h1>
+    </div>
+    <div class="input">
+        <form action="" method="get">
+            <input type="text" name="" id="key" placeholder="Enter the Element to search"/>
+            <button onclick="return Search()">Split search</button>
+        </form>
+    </div>
+
+    <div class="main">
+        <div class="each_box">
+            <p>Searching for:</p>
+            <div class="box" id="key_box"></div>
+        </div>
+        <div class="each_box start-mid-end-box">
+            <div class="box" id="start_box"></div>
+            <p class="box-label">Start</p>
+        </div>
+        <div class="each_box start-mid-end-box">
+            <div class="box" id="mid_box"></div>
+            <p class="box-label">Mid</p>
+        </div>
+        <div class="each_box start-mid-end-box">
+            <div class="box" id="end_box"></div>
+            <p class="box-label">End</p>
+        </div>
+
+
+        <!-- Box to display the found index -->
+        <div class="each_box start-mid-end-box found-box" id="found_box" style="display:none;">
+            <p>Found at:</p>
+            <div id="found_index"></div>
+        </div>
+
+        <!-- Display array content at the bottom -->
+    </div>
+    <div class="each_box array-box" id="array_box">
+        <p class="box-label">Array:</p>
+    </div>
+
+    <!-- Box to display the not found message -->
+        <div class="each_box start-mid-end-box not-found-box" id="not_found_box" style="display:none;">
+            <p>Not Found</p>
+        </div>
+
+    <script>
+        const arr = ['2', '22','3','5','65','67','78','66','90','80','25','1','0','11','35','55','112','7','289','400'];
+        function Search() {
+            var data = document.getElementById("key").value;
+            document.getElementById("key_box").innerText = data;
+            /* The function part */
+            split_search(0,arr.length-1)
+        .then(result => {
+            console.log(result);
+            if(result === -1){
+                document.getElementById('not_found_box').style.display = 'inline-block';
+
+            }
+            // Continue with the rest of your code here
+        });
+
+    function delay(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+
+    function highlightFoundIndex(index) {
+    Array.from(document.getElementsByClassName('array-box-label')).forEach(label => {
+        if (label.id == index) {
+            label.style.backgroundColor = '#00ff00';
+            document.getElementById('found_box').style.display = 'inline-block';
+            document.getElementById('found_box').style.marginTop = '32px';
+
+            document.getElementById('found_index').innerText = index;
+        }
+    });
+}
+
+
+
+    async function split_search(start, end) {
+        let mid = Math.floor((start + end) / 2);
+        if (start > end) {
+            return -1;
+        }
+
+        console.log('start', start);
+        console.log('mid', mid);
+        console.log('end', end);
+
+        // Delay execution for 5 seconds
+        await delay(3000);
+        document.getElementById("start_box").innerHTML = start;
+        document.getElementById("mid_box").innerHTML = mid;
+        document.getElementById("end_box").innerHTML = end;
+
+        const startValue = parseInt(arr[start]);
+        if (!isNaN(startValue)) {
+            highlightIndex(start);
+        }
+        const midValue = parseInt(arr[mid]);
+        if (!isNaN(midValue)) {
+            highlightMidIndex(mid); // Corrected here
+        }
+        const endValue = parseInt(arr[end]);
+        if (!isNaN(endValue)) {
+            highlightEndIndex(end); // Corrected here
+        }
+
+
+        if (arr[start] === data) {
+            highlightFoundIndex(start);
+            return start;
+        } else if (arr[end] === data) {
+            highlightFoundIndex(end);
+            return end;
+        } else if (arr[mid] === data) {
+            highlightFoundIndex(mid);
+            return mid;
+        }
+
+        let left_result = await split_search(start+1, mid - 1);
+        if (left_result !== -1) {
+            return left_result;
+        }
+
+        let right_result = await split_search(mid + 1, end-1);
+        if (right_result !== -1) {
+return right_result;
+        }
+        return -1;
+    }
+
+    function highlightIndex(index) {
+        Array.from(document.getElementsByClassName('array-box-label')).forEach(label => {
+        if(label.style.backgroundColor == 'red' ) {
+            label.style.backgroundColor ='grey';
+            
+        }
+    });
+      
+        const label = document.getElementById(`${index}`);
+        if (label) {
+            label.style.backgroundColor = 'red';
+            label.style.padding = '8px';
+            label.style.borderRadius = '50%';
+
+        }
+    }
+
+    
+    // Add event listener to the start_box
+    const startBox = document.getElementById("start_box");
+    startBox.addEventListener("DOMSubtreeModified", function() {
+        const startValue = parseInt(startBox.innerText);
+        if (!isNaN(startValue)) {
+            highlightIndex(startValue);
+        }
+    });
+
+    function highlightMidIndex(index) {
+
+        Array.from(document.getElementsByClassName('array-box-label')).forEach(label => {
+        if(label.style.backgroundColor == 'yellow' ) {
+            label.style.backgroundColor ='grey';
+        }
+    });
+
+      
+        const label = document.getElementById(`${index}`);
+        if (label) {
+            label.style.backgroundColor = 'yellow';
+            label.style.padding = '5px';
+            label.style.padding = '8px';
+            label.style.borderRadius = '50%';
+
+        }
+    }
+
+    
+    // Add event listener to the mid_box
+    const midBox = document.getElementById("mid_box");
+    midBox.addEventListener("DOMSubtreeModified", function() {
+        const midValue = parseInt(midBox.innerText);
+        if (!isNaN(midValue)) {
+            highlightMidIndex(midValue); // Corrected here
+        }
+    });
+
+
+
+    function highlightEndIndex(index) {
+        Array.from(document.getElementsByClassName('array-box-label')).forEach(label => {
+        if(label.style.backgroundColor == 'blueviolet' ) {
+            label.style.backgroundColor ='grey';
+        }
+    });
+
+        
+        const label = document.getElementById(`${index}`);
+        if (label) {
+            label.style.backgroundColor = 'blueviolet';
+            label.style.padding = '5px';
+            label.style.padding = '8px';
+            label.style.borderRadius = '50%';
+        }
+    }
+
+    
+    // Add event listener to the mid_box
+    const endBox = document.getElementById("end_box");
+    endBox.addEventListener("DOMSubtreeModified", function() {
+        const endValue = parseInt(endBox.innerText);
+        if (!isNaN(endValue)) {
+            highlightMidIndex(endValue); // Corrected here
+        }
+    });
+
+
+
+        return false;
+        }
+    
+    
+        // Display array content in labeled boxes
+        const arrayBox = document.getElementById("array_box");
+        arrayBox.innerHTML = ''; // Clear previous content
+    
+        arr.forEach((element, index) => {
+            const container = document.createElement('div');
+            container.className = 'each_box array-box'; // Add each_box class to container
+            arrayBox.appendChild(container);
+    
+            const box = document.createElement('div');
+            box.className = 'box';
+            box.innerText = element;
+    
+            const label = document.createElement('p');
+            label.className = 'array-box-label';
+            label.id = index;
+            label.innerText = index;
+    
+            container.appendChild(box);
+            container.appendChild(label);
+        });
+    </script>
+</body>
+</html>
